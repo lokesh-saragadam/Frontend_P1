@@ -1,0 +1,6 @@
+#all node modules
+/node_modules
+
+/eslint.config.js
+/index.html
+/vite.config.js

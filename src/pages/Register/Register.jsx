@@ -1,0 +1,76 @@
+import { Link , useNavigate } from "react-router-dom";
+import AuthHeader from "../../components/Headers/AuthHeader.jsx";
+import {log} from "../../utils/logger.js";
+
+export default function Register() {
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      username: e.target.username.value,
+      email: e.target.email.value,
+      password: e.target.password.value,
+    };
+
+    const response = await fetch(
+      "http://localhost:3000/api/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
+    const data = await response.json();
+    localStorage.setItem("token", data.token);   //in future make it HttpOnly Secure Cookie
+    const userId = data.userId;
+    if(data.token){
+        navigate(`/onboarding/${userId}`);//redirect to home page after successful login.
+    }
+    console.log(data);
+  };
+
+  return (
+    <div className="login-page">
+        <AuthHeader/>
+        <div className="login-welcome">
+            <h1>Welcome! Lets get <span className="Highlight">you</span> started ..</h1>
+        </div>
+    <div className = "login-container">
+      <h2>Register</h2>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          name="username"
+          type="text"
+          placeholder="Username"
+          required
+        />
+
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          required
+        />
+
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+        />
+
+        <button type="submit">Register</button>
+      </form>
+
+      <p>
+        Already have an account?
+        <Link to="/login"> Login</Link>
+      </p>
+    </div>
+    </div>
+  );
+}
