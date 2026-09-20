@@ -12,7 +12,7 @@ export default function Hero() {
       </h1>
 
       <p className="text">
-        Log solved problems, monitor progress, and stay consistent —
+        Track your submissions, monitor progress, and stay consistent —
         everything you need to ace your next interview.
       </p>
 

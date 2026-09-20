@@ -1,13 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from "react-router-dom";
-import OverviewCards from './Components/Overview_Recent/OverviewCards.jsx';
-import RecentActivity from './Components/Overview_Recent/RecentActivity.jsx';
-import LoadingSkeleton from './Components/Page/LoadingSkeleton.jsx';
-import Welcome from './Components/Page/Welcome.jsx';
-import { Difficulty , Rating } from './Components/Distributions/Difficulty.jsx';
-import Topic from './Components/Distributions/Topic.jsx'
-import MonthAnaly from './Components/Analytics/Monthly_trend.jsx';
-import HeatMap from './Components/Consistency/Heatmap.jsx';
+import { apiRequest } from '../../utils/api.js';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from "react-router-dom";
+import OverviewCards from './components/overview/OverviewCards.jsx';
+import RecentActivity from './components/overview/RecentActivity.jsx';
+import LoadingSkeleton from './components/layout/LoadingSkeleton.jsx';
+import Welcome from './components/layout/Welcome.jsx';
+import { DifficultyDistributionChart } from './components/distributions/DifficultyDistributionChart.jsx';
+import { RatingDistributionChart } from './components/distributions/RatingDistributionChart.jsx';
+import TopicCoverage from './components/distributions/TopicCoverage.jsx'
+import MonthlySubmissionChart from './components/analytics/MonthlySubmissionChart.jsx';
+import SubmissionHeatmap from './components/activity/SubmissionHeatmap.jsx';
 import './Dashboard.css';
 
 /**
@@ -18,83 +20,84 @@ import './Dashboard.css';
  *
  * Response shape expected from the backend:
  * {
- *   overview: { totalSolved, easy, medium, hard, currentStreak,
- *               longestStreak, platformsConnected, lastSync },
+ *   overview: { uniqueAttemptedProblems, easy, medium, hard, currentStreak,
+ *               longestStreak, platformsConnected, lastSubmissionAtRelative },
  *   recentActivity: [ { problemId, title, difficulty, platform, ... } ]
  * }
  */
 export default function Dashboard() {
-  const [data, setData] = useState(null);
-  const { id: userid } = useParams();
+  const [dashboardResponse, setDashboardResponse] = useState(null);
+  const { id: userId } = useParams();
   const token = localStorage.getItem("token");
-  const [error, setError] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchDashboard = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(
-        `http://localhost:3000/api/dashboard/${userid}`
-        , {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      if (!res.ok) throw new Error(`Request failed (${res.status})`);
-      const json = await res.json();
-      setData(json);
-      console.log("Dashboard API Data:", json);
-    } catch (err) {
-      setError(err.message || 'Failed to load dashboard');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  const navigate = useNavigate();
+  const [retryCount, setRetryCount] = useState(0);
   useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
+    const controller = new AbortController();
+    setLoading(true);
+    setErrorMessage(null);
+    async function load() {
+      try {
+        const responseBody = await apiRequest('/dashboard/' + userId, { token, signal: controller.signal });
+        if (!controller.signal.aborted) setDashboardResponse({ ...responseBody, requestedUserId: userId });
+      } catch (failure) {
+        if (controller.signal.aborted) return;
+        if (failure.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login', { replace: true });
+          return;
+        }
+        setErrorMessage(failure.message);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+    load();
+    return () => controller.abort();
+  }, [userId, token, retryCount, navigate]);
 
   if (loading) return <LoadingSkeleton />;
 
-  if (error) {
+  if (errorMessage) {
     return (
       <div className="dashboard-error">
-        <p>Couldn't load your dashboard: {error}</p>
-        <button onClick={fetchDashboard}>Retry</button>
+        <p>Could not load your dashboard: {errorMessage}</p>
+        <button onClick={() => setRetryCount(value => value + 1)}>Retry</button>
       </div>
     );
   }
 
+  if (!dashboardResponse || dashboardResponse.requestedUserId !== userId) return <LoadingSkeleton />;
+
   return (
     <div className="dashboard">
 
-      <Welcome username={data.username}/>
+      <Welcome username={dashboardResponse.username}/>
       
       <section className="dashboard__overview">
         <h2 className="section-title">Overview</h2>
-        <OverviewCards overview={data.dashboardData.overview} />
+        <OverviewCards overview={dashboardResponse.dashboardData.overview} />
       </section>
 
-      <RecentActivity recentActivity={data.dashboardData.recentActivity} />
+      <RecentActivity recentActivity={dashboardResponse.dashboardData.recentActivity} />
 
       {/* Reserved for later: Analytics, Heatmap, Recommendations */}
       <h2>Distributions</h2>
       <section className="DistributionD">
-        < Difficulty data={data.dashboardData.overview} />
-        < Rating data={data.dashboardData.overview.ratingCounts}/>
+        < DifficultyDistributionChart overview={dashboardResponse.dashboardData.overview} />
+        < RatingDistributionChart problemCountsByRating={dashboardResponse.dashboardData.overview.problemCountsByRating}/>
       </section>
       <h2>Tags</h2>
       <section className="DistributionT">
-        < Topic data={data.dashboardData.TopicWiseSolved}/>
+        < TopicCoverage attemptedProblemCountsByTopic={dashboardResponse.dashboardData.attemptedProblemCountsByTopic}/>
       </section>
       <section className ="Months_Analytics">
-        <MonthAnaly data1 = {data.dashboardData.SolvedAtMonths}/>
+        <MonthlySubmissionChart submissionCountsByMonth = {dashboardResponse.dashboardData.submissionCountsByMonth}/>
       </section>
-      <section className="HeatMap">
-        <HeatMap data={data.dashboardData.DailyCounts}/>
+      <section className="SubmissionHeatmap">
+        <SubmissionHeatmap submissionCountsByDate={dashboardResponse.dashboardData.submissionCountsByDate}/>
       </section>
     </div>
   );

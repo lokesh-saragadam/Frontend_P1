@@ -1,4 +1,3 @@
-import React from 'react';
 import OverviewCard from './OverviewCard';
 
 /**
@@ -9,34 +8,33 @@ import OverviewCard from './OverviewCard';
  *
  * Expected shape (from dashboard/service.js -> getDashboardOverview):
  * {
- *   totalSolved: 843,
+ *   uniqueAttemptedProblems: 843,
  *   easy: 320,
  *   medium: 410,
  *   hard: 113,
  *   currentStreak: 14,
  *   longestStreak: 38,
  *   platformsConnected: 2,
- *   lastSync: "3 minutes ago" | null
+ *   lastSubmissionAtRelative: "3 minutes ago" | null
  * }
  */
 export default function OverviewCards({ overview }) {
   if (!overview) return null;
 
   const {
-    totalSolved,
+    uniqueAttemptedProblems,
     easy,
     medium,
     hard,
-    ratingCounts,
     currentStreak,
     longestStreak,
     platformsConnected,
-    lastSync,
+    lastSubmissionAtRelative,
   } = overview;
 
   return (
     <div className="overview-cards">
-      <OverviewCard label="Total Solved" value={totalSolved} />
+      <OverviewCard label="Attempted Problems" value={uniqueAttemptedProblems} />
       <OverviewCard label="Easy" value={easy} accent="easy" />
       <OverviewCard label="Medium" value={medium} accent="medium" />
       <OverviewCard label="Hard" value={hard} accent="hard" />
@@ -56,7 +54,7 @@ export default function OverviewCards({ overview }) {
         value={platformsConnected}
         sublabel={platformsConnected === 1 ? 'platform' : 'platforms'}
       />
-      {lastSync && <OverviewCard label="Last Sync" value={lastSync} />}
+      {lastSubmissionAtRelative && <OverviewCard label="Last Submission" value={lastSubmissionAtRelative} />}
     </div>
   );
 }

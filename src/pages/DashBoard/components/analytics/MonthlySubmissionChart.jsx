@@ -1,12 +1,11 @@
-import react, { useMemo } from "react";
+import { useMemo } from "react";
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 
 
-export default function MonthAnaly(data1){
-    const groupedData = data1.data1;
-    console.log("Grouped Data",groupedData);
+export default function MonthlySubmissionChart({ submissionCountsByMonth }){
+    const groupedData = submissionCountsByMonth;
 
     const chartData = useMemo(() => {
     // 1. Get all the keys (e.g., ['August 2026', 'July 2026', ...])
@@ -15,37 +14,37 @@ export default function MonthAnaly(data1){
 
     // 2. Convert keys to Date objects so we can find the oldest and newest months
     const dates = keys.map(key => new Date(key));
-    const minDate = new Date(Math.min(...dates));
-    const maxDate = new Date(Math.max(...dates));
+    const firstMonth = new Date(Math.min(...dates));
+    const lastMonth = new Date(Math.max(...dates));
 
-    const data = [];
+    const chartPoints = [];
     
     // 3. Start at the oldest month
-    let currentIterDate = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
-    const endIterDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+    let monthCursor = new Date(firstMonth.getFullYear(), firstMonth.getMonth(), 1);
+    const lastMonthCursor = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1);
 
     // 4. Loop forward month-by-month until we hit the newest month
-    while (currentIterDate <= endIterDate) {
+    while (monthCursor <= lastMonthCursor) {
       // Reconstruct the exact key format (e.g., "August 2026")
       // We enforce 'en-US' so it perfectly matches the English month names in your data
-      const monthName = currentIterDate.toLocaleString('en-US', { month: 'long' });
-      const year = currentIterDate.getFullYear();
-      const exactKey = `${monthName} ${year}`; 
+      const monthName = monthCursor.toLocaleString('en-US', { month: 'long' });
+      const year = monthCursor.getFullYear();
+      const monthKey = `${monthName} ${year}`; 
 
       // Create a shorter label for the X-axis (e.g., "Aug 2026") so it looks cleaner
-      const shortMonth = currentIterDate.toLocaleString('en-US', { month: 'short' });
+      const shortMonth = monthCursor.toLocaleString('en-US', { month: 'short' });
       
-      data.push({
+      chartPoints.push({
         displayLabel: `${shortMonth} ${year}`, // Used for the chart X-axis
-        exactKey: exactKey,                    // Used for the tooltip (optional)
-        problemsSolved: groupedData[exactKey] || 0 // Lookup the value, default to 0 if missing
+        monthKey: monthKey,                    // Used for the tooltip (optional)
+        submissionCount: groupedData[monthKey] || 0 // Lookup the value, default to 0 if missing
       });
 
       // Move to the next month
-      currentIterDate.setMonth(currentIterDate.getMonth() + 1);
+      monthCursor.setMonth(monthCursor.getMonth() + 1);
     }
 
-    return data;
+    return chartPoints;
   }, [groupedData]);
 
   // Calculate dynamic width based on data length (60px per month)
@@ -53,7 +52,7 @@ export default function MonthAnaly(data1){
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4 bg-white rounded-lg shadow">
-      <h2 className="text-xl font-bold mb-4">Problems Solved Over Time</h2>
+      <h2 className="text-xl font-bold mb-4">Submissions Over Time</h2>
       
       {/* Scrollable Window */}
       <div style={{ overflowX: 'auto', overflowY: 'hidden', width: '100%' }}>
@@ -77,7 +76,7 @@ export default function MonthAnaly(data1){
                 labelFormatter={(label, payload) => {
                   // Show the full "August 2026" in the tooltip hover
                   if (payload && payload.length > 0) {
-                    return payload[0].payload.exactKey; 
+                    return payload[0].payload.monthKey; 
                   }
                   return label;
                 }}
@@ -85,12 +84,12 @@ export default function MonthAnaly(data1){
               />
               <Line 
                 type="monotone" 
-                dataKey="problemsSolved" 
+                dataKey="submissionCount" 
                 stroke="#3b82f6" 
                 strokeWidth={3} 
                 dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2 }} 
                 activeDot={{ r: 6 }} 
-                name="Problems Solved" 
+                name="Submissions" 
               />
             </LineChart>
           </ResponsiveContainer>

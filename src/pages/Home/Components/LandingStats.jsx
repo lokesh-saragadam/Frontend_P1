@@ -1,11 +1,11 @@
-// Stats.jsx
+// LandingStats.jsx
 const stats = [
   { value: "500+", label: "Problems tracked" },
   { value: "12",   label: "Topic tags" },
   { value: "100%", label: "Free to use" },
 ];
 
-export default function Stats() {
+export default function LandingStats() {
   return (
     <div className="stats">
       {stats.map((s) => (

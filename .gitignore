@@ -1,6 +1,6 @@
-#all node modules
-/node_modules
-
-/eslint.config.js
-/index.html
-/vite.config.js
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.local

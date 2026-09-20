@@ -1,17 +1,17 @@
-import react from "react";
-import Header from "../../components/Headers/Header.jsx";
-import Hero from "./Components/Hero.jsx";
-import Stats from "./Components/Stats.jsx";
-import Features from "./Components/Features.jsx";
+
+import PublicHeader from "../../components/headers/PublicHeader.jsx";
+import Hero from "./components/Hero.jsx";
+import LandingStats from "./components/LandingStats.jsx";
+import Features from "./components/Features.jsx";
 import "./HomePage.css";
 
 export default function Home(){
     return (
         <div className="home-page">
-            <Header />
+            <PublicHeader />
             <main>
               <Hero />
-              <Stats />
+              <LandingStats />
               <Features />
             </main>
           </div>

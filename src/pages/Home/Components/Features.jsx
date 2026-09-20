@@ -3,7 +3,7 @@ const features = [
   {
     icon: "📋",
     title: "Problem log",
-    desc: "Save every solved problem with notes and difficulty.",
+    desc: "Review imported submissions and problem difficulty.",
   },
   {
     icon: "📊",

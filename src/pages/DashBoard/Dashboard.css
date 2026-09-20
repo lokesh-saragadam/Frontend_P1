@@ -239,3 +239,10 @@
   padding: 40px;
   color: #6b7280;
 }
+
+/* Allow the existing charts to fit narrow viewports. */
+.DistributionD { flex-wrap: wrap; gap: 1rem; }
+.DistributionD > div { max-width: 100%; min-width: 0; }
+.DistributionD > div > div { max-width: 100%; }
+.SubmissionHeatmap { overflow-x: auto; }
+@media (max-width: 480px) { .dashboard { padding: 1rem; gap: 1.5rem; } }

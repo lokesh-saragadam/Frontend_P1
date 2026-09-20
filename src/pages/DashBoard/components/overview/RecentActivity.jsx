@@ -1,4 +1,3 @@
-import React from 'react';
 
 const DIFFICULTY_CLASS = {
   Easy: 'badge--easy',
@@ -19,8 +18,8 @@ const DIFFICULTY_CLASS = {
  *     rating: 1800 | null,          // Codeforces problems
  *     platform: "LeetCode",
  *     language: "Python3" | null,
- *     solvedAt: "2026-08-03T12:40:00Z",
- *     solvedAtRelative: "2 hours ago"
+ *     submittedAt: "2026-08-03T12:40:00Z",
+ *     submittedAtRelative: "2 hours ago"
  *   },
  *   ...
  * ]
@@ -31,7 +30,7 @@ export default function RecentActivity({ recentActivity }) {
       <section className="recent-activity">
         <h2 className="section-title">Recent Activity</h2>
         <p className="recent-activity__empty">
-          Nothing solved yet — once you solve a problem it'll show up here.
+          No submissions yet. Import your platform activity to see it here.
         </p>
       </section>
     );
@@ -42,8 +41,8 @@ export default function RecentActivity({ recentActivity }) {
       <h2 className="section-title">Recent Activity</h2>
       <ul className="recent-activity__list">
         {recentActivity.map((item) => (
-          <li key={item.problemId} className="activity-item">
-            <span className="activity-item__check">✓</span>
+          <li key={item.submissionId} className="activity-item">
+            <span className="activity-item__check" aria-label={item.verdict}>{['Accepted', 'OK'].includes(item.verdict) ? '✓' : '•'}</span>
 
             <div className="activity-item__main">
               <span className="activity-item__title">{item.title}</span>
@@ -53,13 +52,14 @@ export default function RecentActivity({ recentActivity }) {
                     {item.difficulty}
                   </span>
                 )}
-                {item.rating && <span className="badge badge--rating">{item.rating}</span>}
+                {item.problemRating && <span className="badge badge--rating">{item.problemRating}</span>}
                 <span className="activity-item__platform">{item.platform}</span>
+                <span>{item.verdict}</span>
               </div>
             </div>
 
             <span className="activity-item__time">
-              {item.solvedAtRelative ?? new Date(item.solvedAt).toLocaleDateString()}
+              {item.submittedAtRelative ?? new Date(item.submittedAt).toLocaleDateString()}
             </span>
           </li>
         ))}

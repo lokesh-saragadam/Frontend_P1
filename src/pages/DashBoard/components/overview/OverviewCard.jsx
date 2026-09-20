@@ -1,10 +1,9 @@
-import React from 'react';
 
 /**
  * OverviewCard
  * Single stat card used for every metric in the Overview row
- * (Total Solved, Easy, Medium, Hard, Current Streak, Longest Streak,
- * Platforms Connected, Last Sync).
+ * (Attempted Problems, Easy, Medium, Hard, Current Streak, Longest Streak,
+ * Platforms Connected, Last Submission).
  *
  * Purely presentational — pass in whatever value/label/icon you want.
  */
