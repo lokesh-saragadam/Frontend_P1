@@ -10,6 +10,7 @@ import { RatingDistributionChart } from './components/distributions/RatingDistri
 import TopicCoverage from './components/distributions/TopicCoverage.jsx'
 import MonthlySubmissionChart from './components/analytics/MonthlySubmissionChart.jsx';
 import SubmissionHeatmap from './components/activity/SubmissionHeatmap.jsx';
+import RecommendationPanel from './components/recommendations/RecommendationPanel.jsx';
 import './Dashboard.css';
 
 /**
@@ -82,6 +83,8 @@ export default function Dashboard() {
       </section>
 
       <RecentActivity recentActivity={dashboardResponse.dashboardData.recentActivity} />
+
+      <RecommendationPanel />
 
       {/* Reserved for later: Analytics, Heatmap, Recommendations */}
       <h2>Distributions</h2>

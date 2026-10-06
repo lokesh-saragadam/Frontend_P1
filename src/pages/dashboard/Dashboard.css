@@ -240,6 +240,12 @@
   color: #6b7280;
 }
 
+.recommendations { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; color: #111827; }
+.recommendation-card { border-top: 1px solid #e5e7eb; padding: 12px 0; }
+.recommendation-card > div { display: flex; justify-content: space-between; gap: 12px; }
+.recommendation-card p { color: #4b5563; font-size: 13px; margin: 6px 0; }
+.recommendation-card button { margin-right: 8px; }
+
 /* Allow the existing charts to fit narrow viewports. */
 .DistributionD { flex-wrap: wrap; gap: 1rem; }
 .DistributionD > div { max-width: 100%; min-width: 0; }
