@@ -1,4 +1,7 @@
 // Hero.jsx
+import { Link } from "react-router-dom";
+
+  
 export default function Hero() {
   return (
     <section className="intro">
@@ -17,12 +20,16 @@ export default function Hero() {
       </p>
 
       <div className="actions">
-        <button className="btn primary" onClick={() => window.location.href = 'register'}>
-          Sign up free
-        </button>
-        <button className="btn secondary" onClick={() => window.location.href = 'login'}>
-          Log in →
-        </button>
+        <Link to="/register">
+          <button className="btn primary">
+            Sign up free
+          </button>
+        </Link>
+        <Link to="/login">
+          <button className="btn secondary">
+            Log in →
+          </button>
+        </Link>
       </div>
     </section>
   );
